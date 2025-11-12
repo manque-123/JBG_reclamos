@@ -70,7 +70,6 @@ class ReclamoRepository(ctx: Context) {
     }
 }
 
-/* ------- helpers de Cursor ------- */
 private fun android.database.Cursor.getStringOrNull(col: String): String? =
     if (isNull(getColumnIndexOrThrow(col))) null else getString(getColumnIndexOrThrow(col))
 

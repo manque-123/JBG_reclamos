@@ -117,7 +117,6 @@ private fun FormReclamo(
     onGuardar: (String, String, String, String, String?, String?, String?) -> Unit,
     onCancelar: () -> Unit
 ) {
-    // === Conectar CÁMARA y GPS (no cambia el diseño) ===
     val takePhoto = rememberTakePhotoLauncher { uri -> onSetFoto(uri) }
     val requestLocation = rememberLocationRequester { lat, lon -> onSetUbicacion(lat, lon) }
 
@@ -180,7 +179,6 @@ private fun FormReclamo(
             Button(onClick = requestLocation) { Text("Usar ubicación") }
         }
 
-        // (Opcional) Vista previa de foto y coordenadas
         fotoUri?.let {
             AsyncImage(
                 model = it,
