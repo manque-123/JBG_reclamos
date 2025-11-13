@@ -62,9 +62,9 @@ class ReclamoRepository(ctx: Context) {
             put(C_TELEFONO, r.telefono)
             put(C_NRO_COMPRA, r.nroCompra)
             put(C_SUCURSAL, r.sucursal)
-            put(C_FOTO_URI, r.fotoUri)        // NUEVO
-            put(C_LATITUD, r.latitud)         // NUEVO
-            put(C_LONGITUD, r.longitud)       // NUEVO
+            put(C_FOTO_URI, r.fotoUri)
+            put(C_LATITUD, r.latitud)
+            put(C_LONGITUD, r.longitud)
         }
         return db.insert(T_RECLAMOS, null, v)
     }

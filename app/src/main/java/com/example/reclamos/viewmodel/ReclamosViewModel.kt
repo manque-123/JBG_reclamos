@@ -1,30 +1,30 @@
 package com.example.reclamos.viewmodel
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.reclamos.data.ReclamoRepository
 import com.example.reclamos.model.Reclamo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ReclamosViewModel(app: Application) : AndroidViewModel(app) {
+
     private val repo = ReclamoRepository(app)
 
-    private val _reclamos = MutableLiveData<List<Reclamo>>(emptyList())
-    val reclamos: LiveData<List<Reclamo>> = _reclamos
+    val reclamos = MutableLiveData<List<Reclamo>>(emptyList())
+    val mensaje = MutableLiveData<String?>(null)
+    val fotoUri = MutableLiveData<String?>(null)
+    val latLong = MutableLiveData<Pair<Double, Double>?>(null)
+    val guardando = MutableLiveData(false)
 
-    private val _mensaje = MutableLiveData<String?>(null)
-    val mensaje: LiveData<String?> = _mensaje
-
-    private val _fotoUri = MutableLiveData<String?>(null)
-    val fotoUri: LiveData<String?> = _fotoUri
-
-    private val _latLong = MutableLiveData<Pair<Double, Double>?>(null)
-    val latLong: LiveData<Pair<Double, Double>?> = _latLong
-
-    fun cargar() = viewModelScope.launch { _reclamos.value = repo.listar() }
-    fun setFoto(uri: String?) { _fotoUri.value = uri }
-    fun setUbicacion(lat: Double, lon: Double) { _latLong.value = lat to lon }
-    fun clearMensaje() { _mensaje.value = null }
+    fun cargar() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val data = repo.listar()
+            reclamos.postValue(data)
+        }
+    }
 
     fun guardar(
         nombre: String,
@@ -35,28 +35,45 @@ class ReclamosViewModel(app: Application) : AndroidViewModel(app) {
         nroCompra: String?,
         sucursal: String?
     ) {
-        val emailOk = Regex("^[\\w\\-.+]+@[\\w\\-]+\\.[A-Za-z]{2,}$").matches(email.trim())
-        if (nombre.isBlank() || descripcion.length < 10 || categoria.isBlank() || !emailOk) {
-            _mensaje.value = "Completa los campos obligatorios y un email válido."
-            return
+        viewModelScope.launch(Dispatchers.IO) {
+
+            guardando.postValue(true)
+
+            val reclamo = Reclamo(
+                id = 0,
+                nombre = nombre,
+                descripcion = descripcion,
+                categoria = categoria,
+                email = email,
+                telefono = telefono,
+                nroCompra = nroCompra,
+                sucursal = sucursal,
+                fotoUri = fotoUri.value,
+                latitud = latLong.value?.first,
+                longitud = latLong.value?.second
+            )
+
+            repo.insertar(reclamo)
+
+            guardando.postValue(false)
+
+            mensaje.postValue("Reclamo guardado correctamente")
+            cargar()
+
+            fotoUri.postValue(null)
+            latLong.postValue(null)
         }
-        val (lat, lon) = _latLong.value ?: (null to null)
-        val nuevo = Reclamo(
-            nombre = nombre.trim(),
-            descripcion = descripcion.trim(),
-            categoria = categoria,
-            email = email.trim(),
-            telefono = telefono?.trim().takeIf { !it.isNullOrBlank() },
-            nroCompra = nroCompra?.trim().takeIf { !it.isNullOrBlank() },
-            sucursal = sucursal?.trim().takeIf { !it.isNullOrBlank() },
-            fotoUri = _fotoUri.value,
-            latitud = lat,
-            longitud = lon
-        )
-        viewModelScope.launch {
-            val id = repo.insertar(nuevo)
-            _mensaje.value = if (id > 0) "Reclamo enviado ✅" else "Error al guardar"
-            _fotoUri.postValue(null); _latLong.postValue(null); cargar()
-        }
+    }
+
+    fun setFoto(uri: String?) {
+        fotoUri.value = uri
+    }
+
+    fun setUbicacion(lat: Double, lon: Double) {
+        latLong.value = lat to lon
+    }
+
+    fun clearMensaje() {
+        mensaje.value = null
     }
 }

@@ -13,7 +13,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ReclamosApp(vm)   // ← Muestra TU app (lista + formulario con cámara y gps)
+            com.example.reclamos.ui.theme.ReclamosTheme {
+                ReclamosApp(vm)
+            }
         }
+
+
     }
 }
