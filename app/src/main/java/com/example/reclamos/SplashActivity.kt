@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.reclamos.viewmodel.MainActivity
+import com.example.reclamos.MainActivity
 import kotlinx.coroutines.delay
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.Easing
@@ -118,7 +118,6 @@ fun SplashScreen(onFinished: () -> Unit) {
     }
 }
 
-// 100% compatible con todas las versiones de Compose
 fun Modifier.glowEffect(radius: Float): Modifier = this.drawBehind {
     drawCircle(
         color = Color.White.copy(alpha = 0.35f),

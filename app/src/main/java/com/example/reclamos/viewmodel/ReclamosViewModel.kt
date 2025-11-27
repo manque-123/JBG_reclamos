@@ -1,79 +1,59 @@
 package com.example.reclamos.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.reclamos.data.ReclamoRepository
+import com.example.reclamos.data.network.ApiClient
 import com.example.reclamos.model.Reclamo
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ReclamosViewModel(app: Application) : AndroidViewModel(app) {
+class ReclamosViewModel : ViewModel() {
 
-    private val repo = ReclamoRepository(app)
+    val listaReclamos = MutableLiveData<List<Reclamo>>()
+    val mensaje = MutableLiveData<String>()
 
-    val reclamos = MutableLiveData<List<Reclamo>>(emptyList())
-    val mensaje = MutableLiveData<String?>(null)
-    val fotoUri = MutableLiveData<String?>(null)
-    val latLong = MutableLiveData<Pair<Double, Double>?>(null)
-    val guardando = MutableLiveData(false)
-
-    fun cargar() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val data = repo.listar()
-            reclamos.postValue(data)
+    fun cargarReclamos() {
+        viewModelScope.launch {
+            try {
+                listaReclamos.postValue(ApiClient.api.obtenerReclamos())
+            } catch (e: Exception) {
+                mensaje.postValue("Error: ${e.message}")
+            }
         }
     }
 
-    fun guardar(
-        nombre: String,
-        descripcion: String,
-        categoria: String,
-        email: String,
-        telefono: String?,
-        nroCompra: String?,
-        sucursal: String?
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-
-            guardando.postValue(true)
-
-            val reclamo = Reclamo(
-                id = 0,
-                nombre = nombre,
-                descripcion = descripcion,
-                categoria = categoria,
-                email = email,
-                telefono = telefono,
-                nroCompra = nroCompra,
-                sucursal = sucursal,
-                fotoUri = fotoUri.value,
-                latitud = latLong.value?.first,
-                longitud = latLong.value?.second
-            )
-
-            repo.insertar(reclamo)
-
-            guardando.postValue(false)
-
-            mensaje.postValue("Reclamo guardado correctamente")
-            cargar()
-
-            fotoUri.postValue(null)
-            latLong.postValue(null)
+    fun crearReclamo(reclamo: Reclamo, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                ApiClient.api.crearReclamo(reclamo)
+                cargarReclamos()
+                onSuccess()
+            } catch (e: Exception) {
+                mensaje.postValue("Error: ${e.message}")
+            }
         }
     }
 
-    fun setFoto(uri: String?) {
-        fotoUri.value = uri
+    fun actualizarReclamo(id: Long, reclamo: Reclamo, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                ApiClient.api.actualizarReclamo(id, reclamo)
+                cargarReclamos()
+                onSuccess()
+            } catch (e: Exception) {
+                mensaje.postValue("Error: ${e.message}")
+            }
+        }
     }
 
-    fun setUbicacion(lat: Double, lon: Double) {
-        latLong.value = lat to lon
-    }
-
-    fun clearMensaje() {
-        mensaje.value = null
+    fun eliminarReclamo(id: Long) {
+        viewModelScope.launch {
+            try {
+                ApiClient.api.eliminarReclamo(id)
+                cargarReclamos()
+            } catch (e: Exception) {
+                mensaje.postValue("Error: ${e.message}")
+            }
+        }
     }
 }
