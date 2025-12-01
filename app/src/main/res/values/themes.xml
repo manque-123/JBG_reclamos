@@ -1,3 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="JBG_RECLAMOS" parent="Theme.Material3.DayNight.NoActionBar" />
+
+    <style name="Theme.Reclamos" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- Colores principales -->
+        <item name="colorPrimary">@android:color/holo_blue_light</item>
+        <item name="colorPrimaryVariant">@android:color/holo_blue_dark</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+
+        <!-- Fondo -->
+        <item name="android:windowBackground">@android:color/white</item>
+
+    </style>
+
 </resources>

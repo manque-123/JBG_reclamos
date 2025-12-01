@@ -21,29 +21,32 @@ fun ReclamoCrearScreen(
 
     Column(Modifier.padding(16.dp)) {
 
-        TextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
-        TextField(value = descripcion, onValueChange = { descripcion = it }, label = { Text("Descripción") })
-        TextField(value = categoria, onValueChange = { categoria = it }, label = { Text("Categoría") })
-        TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
+        OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
+        OutlinedTextField(value = descripcion, onValueChange = { descripcion = it }, label = { Text("Descripción") })
+        OutlinedTextField(value = categoria, onValueChange = { categoria = it }, label = { Text("Categoría") })
+        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
 
         Spacer(Modifier.height(16.dp))
 
         Button(onClick = {
-            val r = Reclamo(
+            val nuevo = Reclamo(
+                id = 0,
                 nombre = nombre,
                 descripcion = descripcion,
                 categoria = categoria,
                 email = email,
-                telefono = "",
-                nroCompra = "",
-                sucursal = "",
-                fotoUri = "",
+                telefono = null,
+                nroCompra = null,
+                sucursal = null,
+                fotoUri = null,
                 latitud = null,
                 longitud = null
             )
-            viewModel.crearReclamo(r, onSuccess = onBack)
-        }) {
-            Text("Crear")
-        }
+
+            viewModel.crearReclamo(nuevo) {
+                onBack()
+            }
+
+        }) { Text("Crear Reclamo") }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.reclamos
+package com.example.reclamos.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

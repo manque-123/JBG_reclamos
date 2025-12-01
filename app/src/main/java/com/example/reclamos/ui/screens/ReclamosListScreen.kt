@@ -3,23 +3,24 @@ package com.example.reclamos.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.reclamos.model.Reclamo
 import com.example.reclamos.viewmodel.ReclamosViewModel
 
 @Composable
 fun ReclamosListScreen(
     onAgregarClick: () -> Unit,
     onEditarClick: (Long) -> Unit,
+    onVerDetalle: (Long) -> Unit,
+    onLogout: () -> Unit,
     viewModel: ReclamosViewModel = viewModel()
 ) {
     val lista by viewModel.listaReclamos.observeAsState(emptyList())
+    val loading by viewModel.loading.observeAsState(false)
 
     LaunchedEffect(Unit) { viewModel.cargarReclamos() }
 
@@ -29,28 +30,51 @@ fun ReclamosListScreen(
             Text("Agregar Reclamo")
         }
 
-        Spacer(Modifier.height(12.dp))
+        Button(
+            onClick = onLogout,
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            Text("Cerrar sesión")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (loading) {
+            CircularProgressIndicator()
+            return@Column
+        }
 
         LazyColumn {
             items(lista) { reclamo ->
-                ReclamoItem(
-                    reclamo = reclamo,
-                    onEditar = { onEditarClick(reclamo.id) },
-                    onEliminar = { viewModel.eliminarReclamo(reclamo.id) }
-                )
+
+                Column(Modifier.padding(12.dp)) {
+
+                    Text("Nombre: ${reclamo.nombre}")
+                    Text("Descripción: ${reclamo.descripcion}")
+                    Text("Categoría: ${reclamo.categoria}")
+
+                    Row {
+
+                        Button(onClick = { onVerDetalle(reclamo.id) }) {
+                            Text("Ver detalle")
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Button(onClick = { onEditarClick(reclamo.id) }) {
+                            Text("Editar")
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Button(onClick = { viewModel.eliminarReclamo(reclamo.id) }) {
+                            Text("Eliminar")
+                        }
+                    }
+
+                    Divider(Modifier.padding(vertical = 8.dp))
+                }
             }
         }
-    }
-}
-
-@Composable
-fun ReclamoItem(reclamo: Reclamo, onEditar: () -> Unit, onEliminar: () -> Unit) {
-    Column(Modifier.padding(8.dp)) {
-        Text("Nombre: ${reclamo.nombre}")
-        Text("Descripción: ${reclamo.descripcion}")
-        Text("Categoría: ${reclamo.categoria}")
-        Button(onClick = onEditar) { Text("Editar") }
-        Button(onClick = onEliminar) { Text("Eliminar") }
-        Spacer(Modifier.height(12.dp))
     }
 }

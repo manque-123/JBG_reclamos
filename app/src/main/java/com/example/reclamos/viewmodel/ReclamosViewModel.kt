@@ -9,48 +9,82 @@ import kotlinx.coroutines.launch
 
 class ReclamosViewModel : ViewModel() {
 
-    val listaReclamos = MutableLiveData<List<Reclamo>>()
-    val mensaje = MutableLiveData<String>()
+    val listaReclamos = MutableLiveData<List<Reclamo>>(emptyList())
+    val loading = MutableLiveData<Boolean>(false)
+    val mensaje = MutableLiveData<String?>(null)
 
+    //Cargar
     fun cargarReclamos() {
         viewModelScope.launch {
             try {
-                listaReclamos.postValue(ApiClient.api.obtenerReclamos())
+                loading.postValue(true)
+
+                val response = ApiClient.apiService.obtenerReclamos()
+
+                if (response.isSuccessful) {
+                    listaReclamos.postValue(response.body() ?: emptyList())
+                } else {
+                    mensaje.postValue("Error al cargar (${response.code()})")
+                }
+
             } catch (e: Exception) {
                 mensaje.postValue("Error: ${e.message}")
+            } finally {
+                loading.postValue(false)
             }
         }
     }
 
-    fun crearReclamo(reclamo: Reclamo, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            try {
-                ApiClient.api.crearReclamo(reclamo)
-                cargarReclamos()
-                onSuccess()
-            } catch (e: Exception) {
-                mensaje.postValue("Error: ${e.message}")
-            }
-        }
-    }
-
-    fun actualizarReclamo(id: Long, reclamo: Reclamo, onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            try {
-                ApiClient.api.actualizarReclamo(id, reclamo)
-                cargarReclamos()
-                onSuccess()
-            } catch (e: Exception) {
-                mensaje.postValue("Error: ${e.message}")
-            }
-        }
-    }
-
+    //Eliminar
     fun eliminarReclamo(id: Long) {
         viewModelScope.launch {
             try {
-                ApiClient.api.eliminarReclamo(id)
-                cargarReclamos()
+                val response = ApiClient.apiService.eliminarReclamo(id.toInt())
+
+                if (response.isSuccessful) {
+                    cargarReclamos()
+                } else {
+                    mensaje.postValue("Error al eliminar (${response.code()})")
+                }
+
+            } catch (e: Exception) {
+                mensaje.postValue("Error: ${e.message}")
+            }
+        }
+    }
+
+    //Crear
+    fun crearReclamo(reclamo: Reclamo, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                val response = ApiClient.apiService.crearReclamo(reclamo)
+
+                if (response.isSuccessful) {
+                    cargarReclamos()
+                    onSuccess()
+                } else {
+                    mensaje.postValue("Error al crear (${response.code()})")
+                }
+
+            } catch (e: Exception) {
+                mensaje.postValue("Error: ${e.message}")
+            }
+        }
+    }
+
+    //Editar
+    fun actualizarReclamo(id: Long, reclamo: Reclamo, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                val response = ApiClient.apiService.actualizarReclamo(id.toInt(), reclamo)
+
+                if (response.isSuccessful) {
+                    cargarReclamos()
+                    onSuccess()
+                } else {
+                    mensaje.postValue("Error al actualizar (${response.code()})")
+                }
+
             } catch (e: Exception) {
                 mensaje.postValue("Error: ${e.message}")
             }

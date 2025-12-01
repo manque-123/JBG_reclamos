@@ -14,7 +14,8 @@ fun ReclamoEditarScreen(
     onBack: () -> Unit,
     viewModel: ReclamosViewModel = viewModel()
 ) {
-    val reclamo = viewModel.listaReclamos.value?.find { it.id == id }
+    val lista = viewModel.listaReclamos.value ?: emptyList()
+    val reclamo = lista.find { it.id == id }
 
     var nombre by remember { mutableStateOf(reclamo?.nombre ?: "") }
     var descripcion by remember { mutableStateOf(reclamo?.descripcion ?: "") }
@@ -22,21 +23,25 @@ fun ReclamoEditarScreen(
 
     Column(Modifier.padding(16.dp)) {
 
-        TextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
-        TextField(value = descripcion, onValueChange = { descripcion = it }, label = { Text("Descripción") })
-        TextField(value = categoria, onValueChange = { categoria = it }, label = { Text("Categoría") })
+        OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
+        OutlinedTextField(value = descripcion, onValueChange = { descripcion = it }, label = { Text("Descripción") })
+        OutlinedTextField(value = categoria, onValueChange = { categoria = it }, label = { Text("Categoría") })
 
         Spacer(Modifier.height(16.dp))
 
         Button(onClick = {
-            val actualizado = reclamo!!.copy(
-                nombre = nombre,
-                descripcion = descripcion,
-                categoria = categoria
-            )
-            viewModel.actualizarReclamo(id, actualizado, onSuccess = onBack)
-        }) {
-            Text("Guardar Cambios")
-        }
+            if (reclamo != null) {
+                val act = reclamo.copy(
+                    nombre = nombre,
+                    descripcion = descripcion,
+                    categoria = categoria
+                )
+
+                viewModel.actualizarReclamo(id, act) {
+                    onBack()
+                }
+            }
+
+        }) { Text("Guardar Cambios") }
     }
 }
