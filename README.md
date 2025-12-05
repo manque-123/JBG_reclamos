@@ -1,82 +1,71 @@
 # JBG Reclamos
 
 Proyecto desarrollado para la asignatura Desarrollo de Aplicaciones Móviles.  
-Consiste en una aplicación Android hecha en Kotlin con Jetpack Compose, conectada a un backend propio en Node.js y usando también una API externa.
+Consiste en una aplicación Android hecha en Kotlin con Jetpack Compose, conectada a un backend propio y usando también una API externa.
 
-## Integrante
-- Genesis Manque, Benjamin Arriaza, Jose Castillo  
+## Integrantes
+- Genesis Manque
+- Benjamin Arriaza
+- Jose Castillo
 
 ## Descripción General
 La aplicación permite gestionar reclamos desde un dispositivo móvil.  
-Se puede crear, ver, editar y eliminar reclamos.  
-Toda la información se guarda en una base de datos en la nube.
+El usuario puede crear, ver, editar y eliminar reclamos, los cuales se almacenan en una base de datos remota.
 
-El backend se desarrolló en Node.js con Express y PostgreSQL.  
-La app se conecta a este backend usando Retrofit.
+El backend fue desarrollado en Node.js con Express y usa PostgreSQL como base de datos.  
+La comunicación entre la app y el backend se realiza mediante Retrofit.
 
-Para obtener la dirección a partir de la ubicación (latitud y longitud), se usa una API externa llamada Nominatim, que entrega la dirección correspondiente.
+Para obtener la dirección a partir de coordenadas (latitud y longitud), se utiliza la API externa Nominatim (OpenStreetMap).
 
 ## Funcionalidades de la App
-- Inicio de sesión con token.
-- Crear reclamos.
-- Editar reclamos.
-- Eliminar reclamos.
-- Listado de reclamos.
-- Captura de foto.
-- Lectura de coordenadas GPS.
-- Obtener dirección con API externa.
-- Navegación entre pantallas con Compose.
+- Inicio de sesión con token (JWT)
+- Crear reclamos
+- Editar reclamos
+- Eliminar reclamos
+- Listar reclamos
+- Ver detalle de reclamo
+- Obtener dirección con API externa
+- Uso de cámara
+- Uso de GPS
 
-## Tecnologías Utilizadas
-### En Android:
-- Kotlin
-- Jetpack Compose
-- Retrofit
-- ViewModel
-- State
-- Navigation
-- Coroutines
+## Backend Propio (CRUD)
+El servidor implementa:
+- Login con JWT
+- Crear reclamo
+- Obtener reclamos
+- Obtener reclamo por ID
+- Editar reclamo
+- Eliminar reclamo
+- Conexión con PostgreSQL
 
-### En Backend:
-- Node.js
-- Express
-- PostgreSQL
-- JWT para autenticación
-
-## API Externa
-Se usa la API Nominatim para convertir coordenadas GPS en dirección real.
+## API Externa Utilizada
+Se utilizó Nominatim (OpenStreetMap) para convertir lat/lon en dirección.
 
 ## Pruebas Unitarias
-El proyecto contiene pruebas unitarias para ViewModels y Repository, usando JUnit y Mockk.
+Se desarrollaron pruebas para:
+- ViewModels
+- Repository
+- Lógica interna
 
-## APK Firmado
-Se generó un APK firmado en modo release para la entrega final, junto con el archivo de firma digital (.jks).
+Usando:
+- JUnit
+- MockK
 
-## Backend
-El backend contiene rutas para manejar reclamos, hacer login y consultar la API externa.  
-Incluye base de datos en PostgreSQL, autenticación con JWT y controladores REST.
+## Compilación y Ejecución de la App
+1. Abrir el proyecto en Android Studio
+2. Sincronizar Gradle
+3. Ejecutar en dispositivo o instalar la APK release
 
-## Ejecución del Proyecto
-Para la app Android:
-- Abrir en Android Studio
-- Sincronizar Gradle
-- Ejecutar en dispositivo o emulador
+## Ejecutar Backend
+1. Instalar dependencias con:
+   npm install
+2. Crear archivo .env con las variables de entorno
+3. Iniciar servidor con:
+   npm start
 
-Para el backend:
-- Instalar dependencias con npm
-- Configurar variables de entorno
-- Iniciar el servidor
-
-## Gestión del Proyecto
-Se utilizó un repositorio en GitHub para controlar versiones y un tablero de trabajo con las tareas divididas en pendiente, en proceso y hecho.
-
-## Estado del Proyecto
-El proyecto cuenta con:
-- CRUD completo
-- API externa funcionando
-- App Android operativa
-- Backend desplegado
-- Pruebas unitarias
-- APK firmado
-- Arquitectura MVVM
-
+## Entregables Incluidos
+- APK firmado (app-release.apk)
+- Archivo de firma (reclamos_keystore.jks)
+- Repositorio Android
+- Repositorio backend
+- Tablero Trello del proyecto
