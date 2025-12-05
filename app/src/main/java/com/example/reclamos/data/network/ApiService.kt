@@ -1,7 +1,6 @@
 package com.example.reclamos.data.network
 
 import com.example.reclamos.model.Reclamo
-import com.example.reclamos.model.NominatimResponse
 import retrofit2.Response
 import retrofit2.http.*
 

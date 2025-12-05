@@ -3,38 +3,42 @@ package com.example.reclamos.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.reclamos.data.network.ApiClient
-import com.example.reclamos.model.Producto
+import com.example.reclamos.data.network.ReclamoRepository
+import com.example.reclamos.model.Reclamo
 import kotlinx.coroutines.launch
 
-class ProductosViewModel : ViewModel() {
+class ReclamosViewModel(private val repo: ReclamoRepository) : ViewModel() {
 
-    val productos = MutableLiveData<List<Producto>>()
-    val mensaje = MutableLiveData<String>()
+    val listaReclamos = MutableLiveData<List<Reclamo>>(emptyList())
+    val loading = MutableLiveData(false)
 
-    fun cargarProductos() {
+    fun cargarReclamos() {
         viewModelScope.launch {
-            try {
-                val lista = ApiClient.api.obtenerProductos()
-                productos.postValue(lista)
-            } catch (e: Exception) {
-                mensaje.postValue("Error: ${e.message}")
-            }
+            loading.value = true
+            val data = repo.obtenerReclamos()
+            listaReclamos.value = data ?: emptyList()
+            loading.value = false
         }
     }
 
-    fun agregarProducto(nombre: String, precio: Double) {
+    fun crearReclamo(r: Reclamo) {
         viewModelScope.launch {
-            try {
-                val nuevo = Producto(nombre = nombre, precio = precio)
-                val productoCreado = ApiClient.api.crearProducto(nuevo)
-                mensaje.postValue("Producto creado: ${productoCreado.nombre}")
-                cargarProductos()
-            } catch (e: Exception) {
-                mensaje.postValue("Error: ${e.message}")
-            }
+            val ok = repo.crearReclamo(r)
+            if (ok) cargarReclamos()
         }
     }
 
+    fun editarReclamo(id: Long, r: Reclamo) {
+        viewModelScope.launch {
+            val ok = repo.editarReclamo(id.toInt(), r)
+            if (ok) cargarReclamos()
+        }
+    }
 
+    fun eliminarReclamo(id: Long) {
+        viewModelScope.launch {
+            val ok = repo.eliminarReclamo(id.toInt())
+            if (ok) cargarReclamos()
+        }
+    }
 }

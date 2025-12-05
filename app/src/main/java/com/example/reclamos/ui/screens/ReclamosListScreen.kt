@@ -6,21 +6,34 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.reclamos.viewmodel.ReclamosViewModel
 
 @Composable
 fun ReclamosListScreen(
+    viewModel: ReclamosViewModel,
     onAgregarClick: () -> Unit,
     onEditarClick: (Long) -> Unit,
     onVerDetalle: (Long) -> Unit,
-    onLogout: () -> Unit,
-    viewModel: ReclamosViewModel = viewModel()
-) {
-    val lista by viewModel.listaReclamos.observeAsState(emptyList())
-    val loading by viewModel.loading.observeAsState(false)
+    onLogout: () -> Unit
+)
+ {
+     val lista by viewModel.listaReclamos.observeAsState(emptyList())
+
+     if (lista.isEmpty()) {
+         Box(
+             modifier = Modifier.fillMaxSize(),
+             contentAlignment = Alignment.Center
+         ) {
+             CircularProgressIndicator()
+         }
+         return
+     }
+
+
+     val loading by viewModel.loading.observeAsState(false)
 
     LaunchedEffect(Unit) { viewModel.cargarReclamos() }
 

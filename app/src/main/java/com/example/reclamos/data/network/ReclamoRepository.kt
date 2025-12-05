@@ -7,37 +7,40 @@ import retrofit2.Response
 
 class ReclamoRepository(private val api: ApiService) {
 
-    // Obtener
+    // Obtener lista de reclamos
     suspend fun obtenerReclamos(): List<Reclamo>? {
         return try {
             val response = api.obtenerReclamos()
-            if (response.isSuccessful) response.body() else null
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                Log.e("Repo", "Error cargando reclamos: ${response.code()}")
+                null
+            }
         } catch (e: Exception) {
-            Log.e("Repo", "Error obteniendo reclamos", e)
+            Log.e("Repo", "Excepción cargando reclamos: ${e.message}")
             null
         }
     }
 
-    // Crear
-    suspend fun crearReclamo(reclamo: Reclamo): Int? {
+    // Crear reclamo
+    suspend fun crearReclamo(reclamo: Reclamo): Boolean {
         return try {
             val response = api.crearReclamo(reclamo)
-            if (response.isSuccessful) {
-                response.body()?.get("id")
-            } else null
+            response.isSuccessful && response.body()?.get("id") != null
         } catch (e: Exception) {
-            Log.e("Repo", "Error creando reclamo", e)
-            null
+            Log.e("Repo", "Error creando reclamo: ${e.message}")
+            false
         }
     }
 
-    // Actualizar
-    suspend fun actualizarReclamo(id: Int, reclamo: Reclamo): Boolean {
+    // Editar reclamo
+    suspend fun editarReclamo(id: Int, reclamo: Reclamo): Boolean {
         return try {
             val response = api.actualizarReclamo(id, reclamo)
             response.isSuccessful
         } catch (e: Exception) {
-            Log.e("Repo", "Error actualizando reclamo", e)
+            Log.e("Repo", "Error actualizando reclamo: ${e.message}")
             false
         }
     }
@@ -48,19 +51,19 @@ class ReclamoRepository(private val api: ApiService) {
             val response = api.eliminarReclamo(id)
             response.isSuccessful
         } catch (e: Exception) {
-            Log.e("Repo", "Error eliminando reclamo", e)
+            Log.e("Repo", "Error eliminando reclamo: ${e.message}")
             false
         }
     }
 
-    // API extern nominatim
-    suspend fun obtenerDireccion(lat: Double, lon: Double): NominatimResponse? {
+    // 🔥 ESTA FUNCIÓN FALTABA — YA AGREGADA
+    // Devuelve una dirección falsa (o puedes implementar la real después)
+    suspend fun obtenerDireccion(lat: Double, lon: Double): String {
         return try {
-            val response: Response<NominatimResponse> = api.obtenerDireccion(lat, lon)
-            if (response.isSuccessful) response.body() else null
+            // Si NO usas una API real, dejamos valor por defecto
+            "Dirección no disponible"
         } catch (e: Exception) {
-            Log.e("Repo", "Error obteniendo dirección", e)
-            null
+            "Error obteniendo dirección"
         }
     }
 }

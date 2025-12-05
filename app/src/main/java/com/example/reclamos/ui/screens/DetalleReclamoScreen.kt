@@ -1,28 +1,30 @@
 package com.example.reclamos.ui.screens
-import androidx.compose.runtime.*
+
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
 import com.example.reclamos.viewmodel.ReclamosViewModel
 
-
-
-@Composable
+@OptIn(ExperimentalMaterial3Api::class)@Composable
 fun DetalleReclamoScreen(
     id: Long,
-    onBack: () -> Unit,
-    viewModel: ReclamosViewModel = viewModel()
-) {
-    val lista by viewModel.listaReclamos.observeAsState(emptyList())
+    viewModel: ReclamosViewModel,
+    onBack: () -> Unit
+)
+{
 
+    val lista by viewModel.listaReclamos.observeAsState(emptyList())
     val reclamo = lista.find { it.id == id }
 
-    Column(Modifier.padding(16.dp)) {
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
 
         Button(onClick = onBack) {
             Text("Volver")
@@ -30,13 +32,30 @@ fun DetalleReclamoScreen(
 
         Text("Detalle del Reclamo", style = MaterialTheme.typography.titleLarge)
 
-        reclamo?.let {
-            Text("Nombre: ${it.nombre}")
-            Text("Descripción: ${it.descripcion}")
-            Text("Categoría: ${it.categoria}")
-            Text("Email: ${it.email}")
-            Text("Latitud: ${it.latitud}")
-            Text("Longitud: ${it.longitud}")
-        } ?: Text("Reclamo no encontrado")
+        if (reclamo != null) {
+
+            Text("Nombre: ${reclamo.nombre}")
+            Text("Descripción: ${reclamo.descripcion}")
+            Text("Categoría: ${reclamo.categoria}")
+            Text("Email: ${reclamo.email}")
+
+            Spacer(Modifier.height(8.dp))
+
+            reclamo.fotoUri?.let {
+                Image(
+                    painter = rememberAsyncImagePainter(it),
+                    contentDescription = null,
+                    modifier = Modifier.size(200.dp)
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            Text("Latitud: ${reclamo.latitud}")
+            Text("Longitud: ${reclamo.longitud}")
+
+        } else {
+            Text("Reclamo no encontrado", color = MaterialTheme.colorScheme.error)
+        }
     }
 }

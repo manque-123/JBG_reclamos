@@ -3,8 +3,10 @@ package com.example.reclamos.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.navigation.compose.rememberNavController
-import com.example.reclamos.ui.navigation.Navigation
+import com.example.reclamos.ui.navigation.AppNavigation
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,7 +14,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            Navigation(navController)
+
+            Surface(color = MaterialTheme.colorScheme.background) {
+                AppNavigation(navController)
+            }
         }
     }
 }

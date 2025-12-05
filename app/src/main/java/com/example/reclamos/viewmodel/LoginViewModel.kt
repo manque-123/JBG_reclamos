@@ -4,48 +4,46 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.reclamos.data.network.ApiClient
+import com.example.reclamos.data.network.ApiService
 import com.example.reclamos.data.network.TokenManager
 import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(private val api: ApiService) : ViewModel() {
 
-    val mensaje = MutableLiveData<String?>(null)
-    val cargando = MutableLiveData<Boolean>(false)
+    val loading = MutableLiveData(false)
+    val mensajeError = MutableLiveData<String?>(null)
 
-    fun login(
-        context: Context,
-        email: String,
-        password: String,
-        onSuccess: () -> Unit
-    ) {
+    fun login(correo: String, password: String, context: Context) {
         viewModelScope.launch {
+
             try {
-                cargando.postValue(true)
+                loading.value = true
 
                 val body = mapOf(
-                    "email" to email,
+                    "correo" to correo,
                     "password" to password
                 )
 
-                val response = ApiClient.apiService.login(body)
+                val response = api.login(body)
 
                 if (response.isSuccessful) {
+
                     val token = response.body()?.get("token")
                     if (token != null) {
                         TokenManager.saveToken(context, token)
-                        onSuccess()
+                        mensajeError.value = null
                     } else {
-                        mensaje.postValue("Respuesta inválida del servidor")
+                        mensajeError.value = "Error: token no encontrado"
                     }
+
                 } else {
-                    mensaje.postValue("Credenciales incorrectas")
+                    mensajeError.value = "Credenciales incorrectas"
                 }
 
             } catch (e: Exception) {
-                mensaje.postValue("Error: ${e.message}")
+                mensajeError.value = "Error de conexión"
             } finally {
-                cargando.postValue(false)
+                loading.value = false
             }
         }
     }
